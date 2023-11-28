@@ -6,16 +6,17 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .forms import SignUpForm
 from django import forms
+from GlobalV import get_categories
 
 
-categories = Category.objects.all()
+#categories = Category.objects.all()
 # Create your views here.
 def category(request, foo):
     foo = foo.replace('-', ' ')
     try:
         category = Category.objects.get(name = foo)
         products = Product.objects.filter(category = category)
-        return render(request, 'category.html', {'products': products, 'category': category, 'categories': categories})
+        return render(request, 'category.html', {'products': products, 'category': category, 'categories': get_categories()})
     except:
         messages.success(request, ('That Category Doesn`t Exist...'))
         return redirect('home')
@@ -23,15 +24,15 @@ def category(request, foo):
 
 def product(request, pk):
     product = Product.objects.get(id = pk)
-    return render(request, 'product.html', {'product': product, 'categories': categories})
+    return render(request, 'product.html', {'product': product, 'categories': get_categories()})
 
 
 def home(request):
-    products = Product.objects.all()
-    return render(request, 'home.html', {'products': products, 'categories': categories})
+    products = Product.objects.all().order_by('-id')
+    return render(request, 'home.html', {'products': products, 'categories': get_categories()})
 
 def about(request):
-    return render(request, 'about.html', {'categories': categories})
+    return render(request, 'about.html', {'categories': get_categories()})
 
 def login_user(request):
     if request.method == 'POST':

@@ -23,9 +23,22 @@
                         </div>
                         <p class="lead">{{ product.description }}</p>
                         <div class="d-flex">
-                            <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem" />
+                            <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+                                <button class="btn btn-link px-2"
+                                    onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                
+                                <input min="1" name="quantity" id="inputQuantity" value="1" type="number"
+                                    class="form-control form-control-sm" />
+                
+                                <button class="btn btn-link px-2"
+                                    onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                              </div>
                             <button class="btn btn-outline-dark flex-shrink-0" type="button" value="{{ product.id }}" id="add-cart">
-                                <i class="bi-cart-fill me-1"></i>
+                                <i class="bi bi-cart-fill"></i>
                                 Add to cart
                             </button>
                         </div>
@@ -43,12 +56,14 @@
                 url: '{% url "cart_add" %}',
                 data:{
                     product_id: $('#add-cart').val(),
+                    quantity: $('#inputQuantity').val(),
                     csrfmiddlewaretoken: '{{ csrf_token }}',
                     action: 'post'
                 },
 
                 success: function(json){
-                    console.log(json)
+                    //console.log(json)
+                    document.getElementById('cart_quantity').textContent = json.cart_quantity
                 },
 
                 error: function(xhr, errmsg, err){

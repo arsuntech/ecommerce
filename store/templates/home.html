@@ -14,7 +14,6 @@
     <section class="py-5">
         <div class="container px-4 px-lg-5 mt-5">
             <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-
                 {% for product in products %}
                     {% if product.is_sale %}
                         <div class="col mb-5">
@@ -22,7 +21,7 @@
                                 <!-- Sale badge-->
                                 <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
                                 <!-- Product image-->
-                                <img class="card-img-top" src="{{ product.image.url }}" alt="..." />
+                                <a href="{% url 'product' product.id %}"><img class="card-img-top" src="{{ product.image.url }}" alt="..."/></a>
                                 <!-- Product details-->
                                 <div class="card-body p-4">
                                     <div class="text-center">
@@ -35,17 +34,18 @@
                                         &nbsp;${{ product.sale_price }}  
                                     </div>
                                 </div>
-                                <!-- Product actions-->
-                                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                    <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">View Product</a></div>
-                                </div>
+                                <!-- Product Add to cart -->
+                                <button class="btn btn-outline-dark flex-shrink-0" type="button" value="{{ product.id }}" id="add-cart">
+                                    <i class="bi bi-cart-fill"></i>
+                                    Add to cart
+                                </button>
                             </div>
                         </div>
                     {% else %}
                         <div class="col mb-5">
                             <div class="card h-100">
                                 <!-- Product image-->
-                                <img class="card-img-top" src="{{ product.image.url }}" alt="..." />
+                                <a href="{% url 'product' product.id %}"><img class="card-img-top" src="{{ product.image.url }}" alt="..." /></a>
                                 <!-- Product details-->
                                 <div class="card-body p-4">
                                     <div class="text-center">
@@ -55,14 +55,46 @@
                                         ${{ product.price }}  
                                     </div>
                                 </div>
+                                <!-- Product Add to cart -->
+                                <button class="btn btn-outline-dark flex-shrink-0" type="button" value="{{ product.id }}" id="add-cart">
+                                    <i class="bi bi-cart-fill"></i>
+                                    Add to cart
+                                </button>
                                 <!-- Product actions-->
-                                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <!--div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
                                     <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'product' product.id %}">View Product</a></div>
-                                </div>
+                                </div-->
                             </div>
                         </div>
                     {% endif %}
                 {% endfor %}
+            </div>
         </div>
     </section>
+    <script>
+        // Check if button was pressed
+        $(document).on('click', '#add-cart', function(e){
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '{% url "cart_add" %}',
+                data:{
+                    product_id: $(this).attr('value'),
+                    quantity: $('#inputQuantity').val(),
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    action: 'post'
+                },
+
+                success: function(json){
+                    //console.log(json)
+                    document.getElementById('cart_quantity').textContent = json.cart_quantity
+                },
+
+                error: function(xhr, errmsg, err){
+
+                }
+ 
+            });
+        })
+    </script>
 {% endblock content %}
